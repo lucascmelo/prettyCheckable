@@ -117,68 +117,74 @@
 
             $.extend( this.options, options );
 
-            var el = $(this.element);
+            var _this = this,
+                el = $(this.element);
 
             el.parent().addClass('has-pretty-child');
 
             el.css('display', 'none');
 
-            var classType = el.data('type') !== undefined ? el.data('type') : el.attr('type');
+            el.each(function(index, el) {
+                var el = $(el);
+                
+                var classType = el.data('type') !== undefined ? el.data('type') : el.attr('type');
 
-            var label = null,
-                elLabelId = el.attr('id');
+                var label = null,
+                    elLabelId = el.attr('id');
 
-            if (elLabelId !== undefined) {
+                if (elLabelId !== undefined) {
 
-                var elLabel = $('label[for=' + elLabelId + ']');
+                    var elLabel = $('label[for=' + elLabelId + ']');
 
-                if (elLabel.length > 0) {
+                    if (elLabel.length > 0) {
 
-                    label = elLabel.text();
+                        label = elLabel.text();
 
-                    elLabel.remove();
+                        elLabel.remove();
+
+                    }
+
+                }   
+            
+
+                if (el.attr('label') === '') {
+
+                    el.attr('label') = label;
 
                 }
 
-            }
+                label = el.data('label') !== undefined ? el.data('label') : _this.options.label;
 
-            if (this.options.label === '') {
+                var labelPosition = el.data('labelposition') !== undefined ? 'label' + el.data('labelposition') : 'label' + _this.options.labelPosition;
 
-                this.options.label = label;
+                var customClass = el.data('customclass') !== undefined ? el.data('customclass') : _this.options.customClass;
 
-            }
+                var color =  el.data('color') !== undefined ? el.data('color') : _this.options.color;
 
-            label = el.data('label') !== undefined ? el.data('label') : this.options.label;
+                var disabled = el.prop('disabled') === true ? 'disabled' : '';
 
-            var labelPosition = el.data('labelposition') !== undefined ? 'label' + el.data('labelposition') : 'label' + this.options.labelPosition;
+                var containerClasses = ['pretty' + classType, labelPosition, customClass, color].join(' ');
 
-            var customClass = el.data('customclass') !== undefined ? el.data('customclass') : this.options.customClass;
+                el.wrap('<div class="clearfix ' + containerClasses + '"></div>').parent().html();
 
-            var color =  el.data('color') !== undefined ? el.data('color') : this.options.color;
+                var dom = [];
+                var isChecked = el.prop('checked') ? 'checked' : '';
 
-            var disabled = el.prop('disabled') === true ? 'disabled' : '';
+                if (labelPosition === 'labelright') {
 
-            var containerClasses = ['pretty' + classType, labelPosition, customClass, color].join(' ');
+                    dom.push('<a href="#" class="' + isChecked + ' ' + disabled + '"></a>');
+                    dom.push('<label for="' + el.attr('id') + '">' + label + '</label>');
 
-            el.wrap('<div class="clearfix ' + containerClasses + '"></div>').parent().html();
+                } else {
 
-            var dom = [];
-            var isChecked = el.prop('checked') ? 'checked' : '';
+                    dom.push('<label for="' + el.attr('id') + '">' + label + '</label>');
+                    dom.push('<a href="#" class="' + isChecked + ' ' + disabled + '"></a>');
 
-            if (labelPosition === 'labelright') {
+                }
 
-                dom.push('<a href="#" class="' + isChecked + ' ' + disabled + '"></a>');
-                dom.push('<label for="' + el.attr('id') + '">' + label + '</label>');
-
-            } else {
-
-                dom.push('<label for="' + el.attr('id') + '">' + label + '</label>');
-                dom.push('<a href="#" class="' + isChecked + ' ' + disabled + '"></a>');
-
-            }
-
-            el.parent().append(dom.join('\n'));
-            addCheckableEvents(el.parent());
+                el.parent().append(dom.join('\n'));
+                addCheckableEvents(el.parent());
+            });
 
         },
 
